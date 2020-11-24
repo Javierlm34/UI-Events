@@ -44,10 +44,7 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    public void HandleInteract(InputAction.CallbackContext callbackContext)
-    {
-        Debug.Log("Player Interact");
-    }
+   
     public void HandleMove(InputAction.CallbackContext callbackContext)
     {
         inputVector = callbackContext.ReadValue<Vector2>();
