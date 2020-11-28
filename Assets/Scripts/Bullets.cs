@@ -2,14 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullets : MonoBehaviour
+[RequireComponent (typeof (Rigidbody))]
+public class Bullets : MonoBehaviour, IObjectPoolNotifier
 {
     [SerializeField]
     [Range(0, 100f)]
     float limit;
 
-    Vector3 origin;
+    public Vector3 origin;
 
+    private Rigidbody _rb;
+
+    private Rigidbody rb
+    {
+        get
+        {
+            if (_rb == null)
+            {
+                _rb = gameObject.GetComponent<Rigidbody>();
+            }
+            return _rb;
+        }
+    }
     void onEnable()
     {
         origin = transform.position;
@@ -21,14 +35,24 @@ public class Bullets : MonoBehaviour
 
         if (distance >= limit)
         {
-            Destroy(gameObject);
+            gameObject.ReturnToPool();
         }
     }
     private void OnCollisionEnter(Collision collision)
     {
+        gameObject.ReturnToPool();
         var enemy = collision.other.GetComponent<Enemy>();
-        enemy.Hit();
-      
-        Destroy(gameObject);
+        if (enemy != null)
+            enemy.Hit();
+    }
+
+    public void onCreatedOrDequeuedFromPool(bool created)
+    {
+    }
+    public void onEnqueuedtoPool()
+    {
+        transform.rotation = Quaternion.identity;
+        rb.velocity = Vector3.zero;
+
     }
 }
